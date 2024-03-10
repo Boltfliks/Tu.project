@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ContextFreeGrammar>
+  <UniqueId>26</UniqueId>
+  <Terminals>
+    <Terminal>a</Terminal>
+    <Terminal>b</Terminal>
+  </Terminals>
+  <NonTerminals>
+    <NonTerminal>A</NonTerminal>
+    <NonTerminal>B</NonTerminal>
+    <NonTerminal>S</NonTerminal>
+  </NonTerminals>
+  <Rules>
+    <Rule nonTerminal="A">aA</Rule>
+    <Rule nonTerminal="A">ε</Rule>
+    <Rule nonTerminal="B">b</Rule>
+    <Rule nonTerminal="S">aAB</Rule>
+  </Rules>
+</ContextFreeGrammar>
