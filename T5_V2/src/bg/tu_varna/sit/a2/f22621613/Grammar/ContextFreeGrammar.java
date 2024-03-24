@@ -10,7 +10,6 @@ import java.util.Collections;
 import java.util.Random;
 
 public class ContextFreeGrammar implements print  {
-    private static Map<Integer, ContextFreeGrammar> grammarMap = new HashMap<>();
     private int uniqueId;
     private Set<Character> terminals;
     private Set<Character> nonTerminals;
@@ -62,6 +61,9 @@ public class ContextFreeGrammar implements print  {
             this.uniqueId = id;
             return uniqueId;
     }
+    public void setUniqueId(int id){
+        this.uniqueId = id;
+    }
 
 
     @Override
@@ -70,6 +72,7 @@ public class ContextFreeGrammar implements print  {
             System.out.println("Grammar with ID " + id + " not found.");
             return;
         }
+        System.out.println(id);
 
         System.out.println("Terminals:");
         for (char terminal : terminals) {
