@@ -1,5 +1,7 @@
 package bg.tu_varna.sit.a2.f22621613.Grammar;
 
+import bg.tu_varna.sit.a2.f22621613.Grammar.Grammer_Singleton.ListOfGrammars;
+
 import java.util.Set;
 import java.util.HashSet;
 import java.util.List;
@@ -48,13 +50,34 @@ public class ContextFreeGrammar implements print  {
     public void addNonTerminal(char nonTerminal) {
         nonTerminals.add(nonTerminal);
     }
+    public void addRule(int id, String rule){
+        ListOfGrammars grammars = ListOfGrammars.getGrammarListInstanceInstance();
+        StringBuilder sb = new StringBuilder();
+        for (ContextFreeGrammar grammar : grammars.getGrammars()) {
+            if (grammar.getUniqueId() == id) {
+                int arrowIndex = rule.indexOf("->");
+                if (arrowIndex != -1 && arrowIndex < rule.length() - 2) {
+                    char NTer = rule.trim().charAt(0);
+                    sb.append(rule.substring(arrowIndex + 2).trim());
+                    addRule(id,NTer,sb.toString());
+                }
 
-    public void addRule(char nonTerminal, String rule) {
-        if (!rules.containsKey(nonTerminal)) {
-            rules.put(nonTerminal, new ArrayList<>());
+            }
         }
-        rules.get(nonTerminal).add(rule);
     }
+
+    private void addRule(int id,char nonTerminal, String rule) {
+        ListOfGrammars grammars = ListOfGrammars.getGrammarListInstanceInstance();
+        for (ContextFreeGrammar grammar : grammars.getGrammars()) {
+            if (grammar.getUniqueId() == id) {
+                if (!rules.containsKey(nonTerminal)) {
+                    rules.put(nonTerminal, new ArrayList<>());
+                }
+                rules.get(nonTerminal).add(rule);
+            }
+        }
+    }
+
     public int generateID(){
         Random random = new Random();
         int id =random.nextInt(100) + 1;

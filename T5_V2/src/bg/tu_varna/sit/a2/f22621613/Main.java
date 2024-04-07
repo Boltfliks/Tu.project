@@ -59,8 +59,13 @@ public class Main {
 */
         //open read the file
         menu.openFile("Grammars");
+        ContextFreeGrammar readGrammar1 = grammars.getGrammars().get(0);
+        readGrammar1.printGrammar(61);
+        readGrammar1.addRule(61,"B->bB");
+        readGrammar1.printGrammar(61);
 
-        grammars.displayGrammars();
+
+        //grammars.displayGrammars();
 
     }
 }

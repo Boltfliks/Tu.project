@@ -23,6 +23,8 @@ public class ListOfGrammars implements addGrammar {
         return grammars;
     }
 
+
+
     @Override
     public void addGrammar(ContextFreeGrammar contextFreeGrammar) {
         grammars.add(contextFreeGrammar);

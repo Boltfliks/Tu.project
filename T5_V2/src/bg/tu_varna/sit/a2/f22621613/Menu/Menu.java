@@ -22,6 +22,7 @@ public class Menu implements OpenFile, SaveFile,Help,Exit{
         try {
             FileReader fileReader = new FileReader(filename + ".xml");
             StringBuilder content = new StringBuilder();
+            ListOfGrammars grammarList = ListOfGrammars.getGrammarListInstanceInstance();
             int character;
             while ((character = fileReader.read()) != -1) {
                 content.append((char) character);
@@ -43,6 +44,7 @@ public class Menu implements OpenFile, SaveFile,Help,Exit{
 
                 ContextFreeGrammar grammar = new ContextFreeGrammar();
                 grammar.setUniqueId(Id);
+                grammarList.addGrammar(grammar);
                 for (char terminal : terminals) {
                     grammar.addTerminal(terminal);
                 }
@@ -51,11 +53,11 @@ public class Menu implements OpenFile, SaveFile,Help,Exit{
                 }
                 for (String rule : rules) {
                     char nonTerminal = rule.charAt(0);
-                    grammar.addRule(nonTerminal, rule.substring(2));
+                    System.out.println(nonTerminal + "->"+rule.substring(2));
+                    grammar.addRule(Id, nonTerminal + "->" + rule.substring(2));
                 }
 
-                ListOfGrammars grammarList = ListOfGrammars.getGrammarListInstanceInstance();
-                grammarList.addGrammar(grammar);
+
             }
         } catch (IOException e) {
 
