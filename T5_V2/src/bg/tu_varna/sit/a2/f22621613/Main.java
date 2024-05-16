@@ -1,71 +1,42 @@
 package bg.tu_varna.sit.a2.f22621613;
 
-import bg.tu_varna.sit.a2.f22621613.Grammar.ContextFreeGrammar;
 import bg.tu_varna.sit.a2.f22621613.Grammar.Grammer_Singleton.ListOfGrammars;
 import bg.tu_varna.sit.a2.f22621613.Menu.Menu;
+import bg.tu_varna.sit.a2.f22621613.Menu.menuActions.Action;
+import bg.tu_varna.sit.a2.f22621613.Menu.menuActions.MenuMap;
+
+import java.util.Scanner;
 
 public class Main {
 
     public static void main(String[] args) {
-        Menu menu = new Menu();
-        ListOfGrammars grammars = ListOfGrammars.getGrammarListInstanceInstance();
-/*
-        ContextFreeGrammar cfg = new ContextFreeGrammar();
-        cfg.generateID();
-        // Add terminals
-        cfg.addTerminal('a');
-        cfg.addTerminal('b');
+// Create a scanner to read user input
+        MenuMap menuMap = new MenuMap();
 
-        // Add non-terminals
-        cfg.addNonTerminal('S');
-        cfg.addNonTerminal('A');
-        cfg.addNonTerminal('B');
+        // Create a scanner to read user input
+        Scanner scanner = new Scanner(System.in);
 
-        // Add rules
-        cfg.addRule('S', "aAB");
-        cfg.addRule('A', "aA");
-        cfg.addRule('A', "ε"); // ε represents empty string (plan to change to _ for ε)
-        cfg.addRule('B', "b");
+        // Main command loop
+        while (true) {
+            System.out.print("Enter command: ");
+            String input = scanner.nextLine();
 
-        // print method test
-        cfg.printGrammar(cfg.generateID());
+            // Split the input into command and arguments
+            String[] tokens = input.split("\\s+");
+            String command = tokens[0].toLowerCase(); // Get the command in lowercase
 
-        ContextFreeGrammar cfg2 = new ContextFreeGrammar();
-        cfg2.generateID();
-        // Add terminals
-        cfg2.addTerminal('c');
-        cfg2.addTerminal('d');
-
-        // Add non-terminals
-        cfg2.addNonTerminal('S');
-        cfg2.addNonTerminal('C');
-        cfg2.addNonTerminal('D');
-
-        // Add rules
-        cfg2.addRule('S', "cCD");
-        cfg2.addRule('C', "cC");
-        cfg2.addRule('D', "ε"); // ε represents empty string (plan to change to _ for ε)
-        cfg2.addRule('C', "d");
-
-        // print method test
-        cfg2.printGrammar(cfg.generateID());
-
-        // add the two grammars to the singleton
-        grammars.addGrammar(cfg);
-        grammars.addGrammar(cfg2);
-
-        //save the singleton on a file
-        menu.saveFile("Grammars");
-*/
-        //open read the file
-        menu.openFile("Grammars");
-        ContextFreeGrammar readGrammar1 = grammars.getGrammars().get(0);
-        readGrammar1.printGrammar(61);
-        readGrammar1.addRule(61,"B->bB");
-        readGrammar1.printGrammar(61);
-
-
-        //grammars.displayGrammars();
+            // Execute the command using the menu map
+            if (menuMap.hasAction(command)) {
+                // Execute the command using the menu map
+                Action action = menuMap.getAction(command);
+                if (tokens.length >= 0) {
+                    // If additional arguments are provided, pass them to the action
+                    action.action(menuMap,tokens);
+                }
+            } else {
+                System.out.println("Invalid command. Type 'help' for a list of commands.");
+            }
+        }
 
     }
 }

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<List>
+  <ContextFreeGrammar>
+    <Terminals>
+      <Terminal>a</Terminal>
+      <Terminal>b</Terminal>
+      <Terminal>ε</Terminal>
+    </Terminals>
+    <NonTerminals>
+      <NonTerminal>A</NonTerminal>
+      <NonTerminal>B</NonTerminal>
+      <NonTerminal>S</NonTerminal>
+    </NonTerminals>
+    <Rules>
+      <Rule>1. S->aB</Rule>
+      <Rule>2. A->a</Rule>
+      <Rule>3. A->ε</Rule>
+      <Rule>4. B->b</Rule>
+    </Rules>
+  </ContextFreeGrammar>
+  <ContextFreeGrammar>
+    <Terminals>
+      <Terminal>1</Terminal>
+      <Terminal>c</Terminal>
+      <Terminal>ε</Terminal>
+    </Terminals>
+    <NonTerminals>
+      <NonTerminal>S</NonTerminal>
+      <NonTerminal>C</NonTerminal>
+      <NonTerminal>D</NonTerminal>
+    </NonTerminals>
+    <Rules>
+      <Rule>1. S->cC</Rule>
+      <Rule>2. S->C</Rule>
+      <Rule>3. C->1c</Rule>
+      <Rule>4. D->ε</Rule>
+    </Rules>
+  </ContextFreeGrammar>
+</List>

@@ -2,24 +2,53 @@ package bg.tu_varna.sit.a2.f22621613.Menu;
 
 import bg.tu_varna.sit.a2.f22621613.Grammar.ContextFreeGrammar;
 import bg.tu_varna.sit.a2.f22621613.Grammar.Grammer_Singleton.ListOfGrammars;
-import bg.tu_varna.sit.a2.f22621613.Menu.openFile.OpenFile;
 
+import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.util.*;
 
 
-public class Menu implements OpenFile, SaveFile,Help,Exit{
-    protected String filename;
-    protected StringBuilder sb;
+public class Menu implements FileFunctionality{
+    private String filename;
+    private String blackFile = "black";
+
+    public void setFilename(String filename) {
+        this.filename = filename;
+    }
+
+    public String getFilename() {
+        return filename;
+    }
+
+    public String getBlackFile() {
+        return blackFile;
+    }
 
     @Override
-    public void openFile(String filename) {
+    public void openFile(String filename,Menu menu) {
         try {
+            File file = new File(filename + ".xml");
+            File blackFile = new File( "black.xml");
+            File targetFile = new File( filename+".xml");
+            menu.setFilename(filename);
+
+
+            // Copy the blackFile to the targetFile
+            Files.copy(targetFile.toPath(), blackFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+
+            if (!file.exists()) {
+                // If the file doesn't exist, create a new file
+                file.createNewFile();
+                menu.setFilename(filename);
+                System.out.println("File '" + filename + ".xml' created successfully.");
+
+                return;
+            }
+            setFilename(filename);
+
             FileReader fileReader = new FileReader(filename + ".xml");
             StringBuilder content = new StringBuilder();
             ListOfGrammars grammarList = ListOfGrammars.getGrammarListInstanceInstance();
@@ -30,46 +59,41 @@ public class Menu implements OpenFile, SaveFile,Help,Exit{
 
             String[] grammarContents = content.toString().split("<ContextFreeGrammar>");
 
-
             for (int i = 1; i < grammarContents.length; i++) {
                 String grammarContent = grammarContents[i].trim();
                 if (grammarContent.isEmpty()) {
                     continue;
                 }
+                ContextFreeGrammar grammar = new ContextFreeGrammar();
+                grammarList.addGrammar(grammar);
 
-                int Id = findUniqueId(grammarContent);
+                int Id = grammar.generateID();
                 Set<Character> terminals = extractCharacters(grammarContent, "<Terminal>");
                 Set<Character> nonTerminals = extractCharacters(grammarContent, "<NonTerminal>");
                 List<String> rules = findRules(grammarContent);
 
-                ContextFreeGrammar grammar = new ContextFreeGrammar();
-                grammar.setUniqueId(Id);
-                grammarList.addGrammar(grammar);
                 for (char terminal : terminals) {
                     grammar.addTerminal(terminal);
                 }
                 for (char nonTerminal : nonTerminals) {
                     grammar.addNonTerminal(nonTerminal);
                 }
-                for (String rule : rules) {
-                    char nonTerminal = rule.charAt(0);
-                    System.out.println(nonTerminal + "->"+rule.substring(2));
-                    grammar.addRule(Id, nonTerminal + "->" + rule.substring(2));
-                }
 
+                // Extract rules from the XML format
+                for (String rule : rules) {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append(rule.substring(3));
+                    grammar.addRule(grammar.getUniqueId(), sb.toString());
+                }
 
             }
         } catch (IOException e) {
-
+            // Handle IOException
         }
     }
-    @Override
-    public int findUniqueId(String content) {
-        int startIndex = content.indexOf("<UniqueId>") + "<UniqueId>".length();
-        int endIndex = content.indexOf("</UniqueId>");
-        String idString = content.substring(startIndex, endIndex);
-        return Integer.parseInt(idString.trim());
-    }
+
+
+
     @Override
     public Set<Character> extractCharacters(String content, String tag) {
         Set<Character> characters = new HashSet<>();
@@ -84,67 +108,35 @@ public class Menu implements OpenFile, SaveFile,Help,Exit{
         }
         return characters;
     }
-    @Override
     public List<String> findRules(String content) {
         List<String> rules = new ArrayList<>();
-        int startIndex = content.indexOf("<Rule nonTerminal=");
+        int startIndex = content.indexOf("<Rule>");
         while (startIndex != -1) {
-            int nonTerminalIndex = content.indexOf("\"", startIndex) + 1;
-            char nonTerminal = content.charAt(nonTerminalIndex);
-            startIndex = content.indexOf(">", startIndex) + 1;
+            startIndex += "<Rule>".length();
             int endIndex = content.indexOf("</Rule>", startIndex);
             if (endIndex != -1) {
-                String rule = nonTerminal + " " + content.substring(startIndex, endIndex);
-                rules.add(rule);
+                rules.add(content.substring(startIndex, endIndex));
             }
-            startIndex = content.indexOf("<Rule", endIndex);
+            startIndex = content.indexOf("<Rule>", endIndex);
         }
         return rules;
     }
 
-    public void saveFile(String filename) {
-        ListOfGrammars grammarListInstance = ListOfGrammars.getGrammarListInstanceInstance();
-        List<ContextFreeGrammar> grammars = grammarListInstance.getGrammars();
-        try (FileWriter writer = new FileWriter(filename + ".xml")) {
-            writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-            writer.write("<List>\n"); // Changed the root element to List
+    @Override
+    public void closeFile() {
+        filename = null;
 
-            for (ContextFreeGrammar contextFreeGrammar : grammars) {
-                writer.write("  <ContextFreeGrammar>\n");
+        System.out.println("Successfully closed file.");
+    }
 
-                // Write unique ID
-                writer.write("    <UniqueId>" + contextFreeGrammar.getUniqueId() + "</UniqueId>\n");
+    @Override
+    public void saveFileAs(String filename) {
 
-                // Write terminals
-                writer.write("    <Terminals>\n");
-                for (char terminal : contextFreeGrammar.getTerminals()) {
-                    writer.write("      <Terminal>" + terminal + "</Terminal>\n");
-                }
-                writer.write("    </Terminals>\n");
+    }
 
-                // Write non-terminals
-                writer.write("    <NonTerminals>\n");
-                for (char nonTerminal : contextFreeGrammar.getNonTerminals()) {
-                    writer.write("      <NonTerminal>" + nonTerminal + "</NonTerminal>\n");
-                }
-                writer.write("    </NonTerminals>\n");
+    public void saveFile() {
 
-                // Write rules
-                writer.write("    <Rules>\n");
-                for (char nonTerminal : contextFreeGrammar.getNonTerminals()) {
-                    List<String> ruleList = contextFreeGrammar.getRules(nonTerminal);
-                    for (String rule : ruleList) {
-                        writer.write("      <Rule nonTerminal=\"" + nonTerminal + "\">" + rule + "</Rule>\n");
-                    }
-                }
-                writer.write("    </Rules>\n");
 
-                writer.write("  </ContextFreeGrammar>\n");
-            }
-            writer.write("</List>");
-        } catch (IOException e) {
-            // Handle IOException
-        }
     }
         @Override
         public void help(){
