@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <List>
   <ContextFreeGrammar>
-    <UniqueId>61</UniqueId>
     <Terminals>
       <Terminal>a</Terminal>
       <Terminal>b</Terminal>
+      <Terminal>e</Terminal>
     </Terminals>
     <NonTerminals>
       <NonTerminal>A</NonTerminal>
@@ -12,28 +12,10 @@
       <NonTerminal>S</NonTerminal>
     </NonTerminals>
     <Rules>
-      <Rule nonTerminal="A">aA</Rule>
-      <Rule nonTerminal="A">ε</Rule>
-      <Rule nonTerminal="B">b</Rule>
-      <Rule nonTerminal="S">aAB</Rule>
-    </Rules>
-  </ContextFreeGrammar>
-  <ContextFreeGrammar>
-    <UniqueId>19</UniqueId>
-    <Terminals>
-      <Terminal>c</Terminal>
-      <Terminal>d</Terminal>
-    </Terminals>
-    <NonTerminals>
-      <NonTerminal>S</NonTerminal>
-      <NonTerminal>C</NonTerminal>
-      <NonTerminal>D</NonTerminal>
-    </NonTerminals>
-    <Rules>
-      <Rule nonTerminal="S">cCD</Rule>
-      <Rule nonTerminal="C">cC</Rule>
-      <Rule nonTerminal="C">d</Rule>
-      <Rule nonTerminal="D">ε</Rule>
+      <Rule>1. S->aB</Rule>
+      <Rule>2. A->a</Rule>
+      <Rule>3. A->e</Rule>
+      <Rule>4. B->b</Rule>
     </Rules>
   </ContextFreeGrammar>
 </List>
