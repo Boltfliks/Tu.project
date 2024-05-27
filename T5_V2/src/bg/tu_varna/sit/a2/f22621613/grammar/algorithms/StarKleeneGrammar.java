@@ -1,6 +1,7 @@
 package bg.tu_varna.sit.a2.f22621613.grammar.algorithms;
 
 import bg.tu_varna.sit.a2.f22621613.grammar.contextFreeGrammar.ContextFreeGrammar;
+import bg.tu_varna.sit.a2.f22621613.grammar.contextFreeGrammar.Rule;
 import bg.tu_varna.sit.a2.f22621613.grammar.grammer_Singleton.ListOfGrammars;
 
 import java.util.ArrayList;
@@ -13,48 +14,42 @@ import java.util.Set;
  * that represents the Kleene star (iteration) of an original grammar.
  */
 public class StarKleeneGrammar {
+    private ContextFreeGrammar grammar;
+
+    public StarKleeneGrammar(ContextFreeGrammar grammar) {
+        this.grammar = grammar;
+    }
+
+    public ContextFreeGrammar getGrammar() {
+        return grammar;
+    }
+
     /**
-     * Creates a new grammar that is an iteration (Kleene star) of the original grammar with the given ID.
+     * Iterates (applies the Kleene star operation to) a context-free grammar.
      *
-     * @param id The unique identifier of the original grammar.
-     * @return The new grammar representing the iteration (Kleene star) of the original grammar.
+     * @param originalGrammar The original context-free grammar.
+     * @return A new context-free grammar that represents the iteration (Kleene star) of the original grammar.
      */
-    public ContextFreeGrammar iter(int id) {
+    public ContextFreeGrammar iter(ContextFreeGrammar originalGrammar) {
         ListOfGrammars grammars = ListOfGrammars.getGrammarListInstanceInstance();
-        ContextFreeGrammar originalGrammar = grammars.getGrammarById(id);
         ContextFreeGrammar resultGrammar = new ContextFreeGrammar();
         grammars.addGrammar(resultGrammar);
 
-        int newId = resultGrammar.generateID();
-        resultGrammar.setUniqueId(newId);
+        resultGrammar.generateID();
 
         resultGrammar.getTerminals().addAll(originalGrammar.getTerminals());
         resultGrammar.getNonTerminals().addAll(originalGrammar.getNonTerminals());
 
-        Set<Character> nonTerminalsCopy = new HashSet<>(originalGrammar.getNonTerminals());
-        for (char nonTerminal : nonTerminalsCopy) {
-            List<String> originalRules = new ArrayList<>(originalGrammar.getRules(nonTerminal));
-            for (String rule : originalRules) {
-                int arrowIndex = rule.indexOf("->");
-                if (arrowIndex != -1 && arrowIndex < rule.length() - 2) {
-                    String production = rule.substring(arrowIndex + 2).trim();
-                    resultGrammar.addRule(newId, production);
-                }
+        Set<Rule> rules = originalGrammar.getRules();
+        for (Rule rule : rules) {
+            if (!rule.getRight().equals("e")) {
+                Rule one = new Rule(0, rule.getLeft(), rule.getRight().concat(rule.getLeft()));
+                Rule two = new Rule(0, rule.getLeft(), "e");
+                resultGrammar.addRule(resultGrammar, one);
+                resultGrammar.addRule(resultGrammar, two);
             }
-
-            for (String rule : originalRules) {
-                char firstSymbol = rule.charAt(rule.indexOf("->") + 2);
-                if (firstSymbol != 'e') {
-                    String Rule1 = nonTerminal + "->" + firstSymbol + nonTerminal;
-                    String Rule2 = nonTerminal + "->" + firstSymbol;
-
-                    resultGrammar.addRule(newId, Rule1.trim());
-                    resultGrammar.addRule(newId, Rule2.trim());
-                }
-            }
-
-            resultGrammar.addRule(newId, nonTerminal + "->e");
         }
+        System.out.println(resultGrammar.getUniqueId());
         return resultGrammar;
     }
 }

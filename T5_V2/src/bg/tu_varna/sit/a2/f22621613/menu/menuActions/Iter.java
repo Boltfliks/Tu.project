@@ -26,8 +26,8 @@ public class Iter implements Action {
             int id = Integer.parseInt(tokens[1]);
             ListOfGrammars grammars = ListOfGrammars.getGrammarListInstanceInstance();
             ContextFreeGrammar grammar = grammars.getGrammarById(id);
-            StarKleeneGrammar kleeneGrammar = new StarKleeneGrammar();
-            kleeneGrammar.iter(grammar.getUniqueId());
+            StarKleeneGrammar kleeneGrammar = new StarKleeneGrammar(grammar);
+            kleeneGrammar.iter(grammar);
         } catch (NumberFormatException e) {
             try {
                 throw new MenuException("Wrong ID");

@@ -35,5 +35,6 @@ public class CYK implements Action {
         } catch (MenuException e) {
             System.out.println("Error: " + e.getMessage());
         }
+
     }
 }

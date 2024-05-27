@@ -12,7 +12,8 @@ public class ContextFreeGrammar implements Print {
     private int uniqueId;
     private Set<Character> terminals;
     private Set<Character> nonTerminals;
-    private Map<Character, List<String>> rules;
+    private Set<Rule> rules;
+    private int ruleCount;
 
     /**
      * Constructs a new ContextFreeGrammar with empty sets of terminals, non-terminals, and rules.
@@ -20,7 +21,8 @@ public class ContextFreeGrammar implements Print {
     public ContextFreeGrammar() {
         terminals = new HashSet<>();
         nonTerminals = new HashSet<>();
-        rules = new LinkedHashMap<>();
+        rules = new LinkedHashSet<>();
+        ruleCount = 0;
     }
 
     /**
@@ -46,18 +48,16 @@ public class ContextFreeGrammar implements Print {
      *
      * @return The map of production rules.
      */
-    public Map<Character, List<String>> getRules() {
+    public Set<Rule> getRules() {
         return rules;
     }
 
-    /**
-     * Returns the list of production rules for a given non-terminal symbol.
-     *
-     * @param nonTerminal The non-terminal symbol.
-     * @return The list of production rules for the non-terminal symbol.
-     */
-    public List<String> getRules(char nonTerminal) {
-        return rules.getOrDefault(nonTerminal, Collections.emptyList());
+    public int getRuleCount() {
+        return ruleCount;
+    }
+
+    public void setRuleCount(int ruleCount) {
+        this.ruleCount = ruleCount;
     }
 
     /**
@@ -92,7 +92,7 @@ public class ContextFreeGrammar implements Print {
      *
      * @param rules The map of production rules.
      */
-    public void setRules(Map<Character, List<String>> rules) {
+    public void setRules(Set<Rule> rules) {
         this.rules = rules;
     }
 
@@ -118,137 +118,66 @@ public class ContextFreeGrammar implements Print {
         }
     }
 
+
     /**
-     * Adds a production rule to the grammar.
+     * Adds a rule to the given context-free grammar and updates the rule count.
      *
-     * @param id The unique identifier of the grammar.
-     * @param rule The production rule to add.
+     * @param grammar The context-free grammar to which the rule is added.
+     * @param rule The rule to be added.
      */
-    public void addRule(int id, String rule) {
-        ListOfGrammars grammars = ListOfGrammars.getGrammarListInstanceInstance();
-        for (ContextFreeGrammar grammar : grammars.getGrammars()) {
-            if (grammar.getUniqueId() == id) {
-                int arrowIndex = rule.indexOf("->");
-                if (arrowIndex != -1 && arrowIndex < rule.length() - 2) {
-                    char nonTerminal = rule.charAt(0);
-                    String production = rule.substring(arrowIndex + 2).trim();
+    public void addRule(ContextFreeGrammar grammar, Rule rule) {
+        ruleCount++;
+        grammar.getRules().add(rule);
+        grammar.addNonTerminal(rule.getLeft().charAt(0));
+        for(char s : rule.getRight().toCharArray()){
+            if(s >= 'A' && s <= 'Z')
+                grammar.addNonTerminal(s);
+            else if((s >= 'a' && s <= 'z') || s >= '0' && s<= '9')
+                grammar.addTerminal(s);
+        }
+        int number = 1;
+        for (Rule sortRule : rules) {
+            sortRule.setNumber(number);
+            number++;
+        }
 
-                    if (!grammar.getNonTerminals().contains(nonTerminal)) {
-                        grammar.addNonTerminal(nonTerminal);
-                    }
+    }
 
-                    for (char symbol : production.toCharArray()) {
-                        if ((symbol >= '0' && symbol <= '9') || (symbol >= 'a' && symbol <= 'z') || symbol == 'e') {
-                            grammar.addTerminal(symbol);
-                        } else {
-                            grammar.addNonTerminal(symbol);
-                        }
-                    }
-
-                    List<String> nonTerminalRules = grammar.getRules().get(nonTerminal);
-                    if (nonTerminalRules == null) {
-                        nonTerminalRules = new ArrayList<>();
-                        grammar.getRules().put(nonTerminal, nonTerminalRules);
-                    }
-                    nonTerminalRules.add("0. " + rule);
-
-                    Map<Character, List<String>> numberedRules = new LinkedHashMap<>();
-                    int ruleNumber = 1;
-                    for (Map.Entry<Character, List<String>> entry : grammar.getRules().entrySet()) {
-                        char nt = entry.getKey();
-                        List<String> rules = entry.getValue();
-                        List<String> updatedRules = new ArrayList<>();
-                        for (String rul : rules) {
-                            updatedRules.add(ruleNumber + ". " + rul.substring(3).trim());
-                            ruleNumber++;
-                        }
-                        numberedRules.put(nt, updatedRules);
-                    }
-                    grammar.setRules(numberedRules);
-                }
+    /**
+     * Removes a rule by its number from the given context-free grammar and updates the rule count.
+     *
+     * @param grammar The context-free grammar from which the rule is removed.
+     * @param number The number of the rule to be removed.
+     */
+    public void removeRule(ContextFreeGrammar grammar, int number) {
+        for (Rule rule : rules) {
+            if (rule.getNumber() == number) {
+                rules.remove(rule);
+                ruleCount--;
+                break;
             }
         }
-    }
-
-    /**
-     * Removes a production rule from the grammar.
-     *
-     * @param id The unique identifier of the grammar.
-     * @param n The position of the rule to remove (1-based index).
-     */
-    public void removeRule(int id, int n) {
-        ListOfGrammars grammars = ListOfGrammars.getGrammarListInstanceInstance();
-        for (ContextFreeGrammar grammar : grammars.getGrammars()) {
-            if (grammar.getUniqueId() == id) {
-                List<String> allRules = new ArrayList<>();
-                for (List<String> rules : grammar.getRules().values()) {
-                    allRules.addAll(rules);
-                }
-
-                if (n <= allRules.size()) {
-                    String removedRule = allRules.remove(n - 1);
-
-                    int index = 1;
-                    Map<Character, List<String>> renumberedRules = new LinkedHashMap<>();
-                    for (String rule : allRules) {
-                        char nonTerminal = rule.charAt(2);
-                        if (!renumberedRules.containsKey(nonTerminal)) {
-                            renumberedRules.put(nonTerminal, new ArrayList<>());
-                        }
-                        renumberedRules.get(nonTerminal).add(index + ". " + rule.substring(3));
-                        index++;
-                    }
-                    grammar.setRules(renumberedRules);
-
-                    Set<Character> usedNonTerminals = new HashSet<>();
-                    for (String rule : allRules) {
-                        usedNonTerminals.add(rule.charAt(3));
-                    }
-
-                    Set<Character> usedTerminals = new HashSet<>();
-                    for (String rule : allRules) {
-                        usedNonTerminals.add(rule.charAt(3));
-                        for (char c : rule.substring(3).toCharArray()) {
-                            if (Character.isLetterOrDigit(c) || c == 'e') {
-                                usedTerminals.add(c);
-                            }
-                        }
-                    }
-
-                    grammar.getNonTerminals().retainAll(usedNonTerminals);
-                    grammar.getTerminals().retainAll(usedTerminals);
-
-                    char removedNonTerminal = removedRule.charAt(3);
-                    if (!usedNonTerminals.contains(removedNonTerminal)) {
-                        grammar.getNonTerminals().remove(removedNonTerminal);
-                    }
-
-                    return;
-                }
-            }
+        int n = 1;
+        for (Rule sortRule : rules) {
+            sortRule.setNumber(n);
+            n++;
         }
     }
 
     /**
-     * Checks if the grammar with the given ID is empty (no terminals, non-terminals, or rules).
+     * Checks if the given context-free grammar is empty.
      *
-     * @param id The unique identifier of the grammar.
-     * @return True if the grammar is empty, false otherwise.
+     * @param grammar The context-free grammar to check.
+     * @return True if the grammar has no rules, otherwise false.
      */
-    public boolean empty(int id) {
-        ListOfGrammars grammars = ListOfGrammars.getGrammarListInstanceInstance();
-        ContextFreeGrammar grammar = grammars.getGrammarById(id);
-        if (grammar == null) {
-            return false;
-        }
-
-        return grammar.getRules().isEmpty() && grammar.getTerminals().isEmpty() && grammar.getNonTerminals().isEmpty();
+    public boolean empty(ContextFreeGrammar grammar) {
+        return grammar.getRules().isEmpty();
     }
 
     /**
-     * Generates a unique identifier for the grammar.
+     * Generates a unique identifier for the context-free grammar.
      *
-     * @return The unique identifier.
+     * @return The generated unique identifier.
      */
     public int generateID() {
         Random random = new Random();
@@ -264,6 +193,7 @@ public class ContextFreeGrammar implements Print {
         }
         return uniqueId;
     }
+
 
     /**
      * Sets the unique identifier for the grammar.
@@ -296,13 +226,12 @@ public class ContextFreeGrammar implements Print {
         for (char nonTerminal : nonTerminals) {
             System.out.println(nonTerminal);
         }
-
         System.out.println("Rules:");
-        for (Map.Entry<Character, List<String>> entry : rules.entrySet()) {
-            List<String> ruleList = entry.getValue();
-            for (String rule : ruleList) {
-                System.out.println(rule);
-            }
+        List<Rule> sortedRules = new ArrayList<>(rules);
+        sortedRules.sort((rule1, rule2) -> Integer.compare(rule1.getNumber(), rule2.getNumber()));
+
+        for (Rule rule : sortedRules) {
+            System.out.println(rule.getNumber() + " " + rule.getLeft() + "->" + rule.getRight());
         }
     }
 
@@ -338,12 +267,8 @@ public class ContextFreeGrammar implements Print {
             }
             writer.write("    </NonTerminals>\n");
             writer.write("    <Rules>\n");
-            for (Map.Entry<Character, List<String>> entry : rules.entrySet()) {
-                char nonTerminal = entry.getKey();
-                List<String> ruleList = entry.getValue();
-                for (String rule : ruleList) {
-                    writer.write("      <Rule>" + rule + "</Rule>\n");
-                }
+            for (Rule rule : rules) {
+                    writer.write("      <Rule>" + rule.getNumber() + ". " + rule.getLeft() +"->"+rule.getRight() + "</Rule>\n");
             }
             writer.write("    </Rules>\n");
             writer.write("  </ContextFreeGrammar>\n");

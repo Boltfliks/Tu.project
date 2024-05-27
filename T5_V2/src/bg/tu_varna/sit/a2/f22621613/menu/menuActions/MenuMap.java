@@ -20,7 +20,6 @@ public class MenuMap {
      */
     public MenuMap() {
         menu = new Menu();
-        // Initialize the action map with enum FOR COMMAND
         actionMap.put(Commands.OPEN, new Open());
         actionMap.put(Commands.NEW, new NewGrammar());
         actionMap.put(Commands.LIST, new List());

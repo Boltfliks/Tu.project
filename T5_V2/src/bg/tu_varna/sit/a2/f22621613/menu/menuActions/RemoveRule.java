@@ -23,7 +23,7 @@ public class RemoveRule implements Action {
             int id = Integer.parseInt(tokens[1]);
             int rule = Integer.parseInt(tokens[2]);
             ListOfGrammars grammars = ListOfGrammars.getGrammarListInstanceInstance();
-            grammars.getGrammarById(id).removeRule(id, rule);
+            grammars.getGrammarById(id).removeRule(grammars.getGrammarById(id), rule);
         } catch (NumberFormatException e) {
             try {
                 throw new MenuException("Wrong Id");

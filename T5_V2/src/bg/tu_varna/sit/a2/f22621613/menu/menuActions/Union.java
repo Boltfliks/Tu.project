@@ -1,6 +1,7 @@
 package bg.tu_varna.sit.a2.f22621613.menu.menuActions;
 
 import bg.tu_varna.sit.a2.f22621613.grammar.algorithms.UnionGrammar;
+import bg.tu_varna.sit.a2.f22621613.grammar.grammer_Singleton.ListOfGrammars;
 import bg.tu_varna.sit.a2.f22621613.menu.menuFunctionality.MenuException;
 
 /**
@@ -20,10 +21,11 @@ public class Union implements Action {
             if (tokens.length != 3) {
                 throw new MenuException("Invalid number of arguments. Expected usage: <command> <id1> <id2>");
             }
+            ListOfGrammars grammars = ListOfGrammars.getGrammarListInstanceInstance();
             int id1 = Integer.parseInt(tokens[1]);
             int id2 = Integer.parseInt(tokens[2]);
             UnionGrammar unionGrammar = new UnionGrammar();
-            unionGrammar.union(id1, id2);
+            unionGrammar.union(grammars.getGrammarById(id1), grammars.getGrammarById(id2));
         } catch (NumberFormatException f) {
             try {
                 throw new MenuException("Wrong Id");

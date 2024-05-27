@@ -1,6 +1,7 @@
 package bg.tu_varna.sit.a2.f22621613.grammar.algorithms;
 
 import bg.tu_varna.sit.a2.f22621613.grammar.contextFreeGrammar.ContextFreeGrammar;
+import bg.tu_varna.sit.a2.f22621613.grammar.contextFreeGrammar.Rule;
 import bg.tu_varna.sit.a2.f22621613.grammar.grammer_Singleton.ListOfGrammars;
 
 import java.util.*;
@@ -9,7 +10,7 @@ import java.util.*;
  * This class represents a grammar in Chomsky Normal Form.
  */
 public class ChomskyGrammar {
-    private ContextFreeGrammar grammar;
+    private ContextFreeGrammar originalGrammar;
 
     /**
      * Constructor for ChomskyGrammar.
@@ -17,7 +18,7 @@ public class ChomskyGrammar {
      * @param grammar The context-free grammar.
      */
     public ChomskyGrammar(ContextFreeGrammar grammar) {
-        this.grammar = grammar;
+        this.originalGrammar = grammar;
     }
 
     /**
@@ -26,7 +27,7 @@ public class ChomskyGrammar {
      * @return The context-free grammar.
      */
     public ContextFreeGrammar getGrammar() {
-        return grammar;
+        return originalGrammar;
     }
 
     /**
@@ -35,38 +36,40 @@ public class ChomskyGrammar {
      * @return True if the grammar is in Chomsky Normal Form, otherwise false.
      */
     public boolean chomsky() {
-        for (char nonTerminal : grammar.getNonTerminals()) {
-            if (grammar.getNonTerminals().contains(nonTerminal)) {
-                List<String> rules = grammar.getRules(nonTerminal);
-                for (String rule : rules) {
-                    String production = rule.substring(rule.indexOf("->") + 2).trim();
-                    int terminals = 0;
-                    int nonTerminals = 0;
-                    char firstSymbol = production.charAt(0);
-                    for (char symbol : production.toCharArray()) {
-                        if (grammar.getTerminals().contains(firstSymbol)) {
-                            if (grammar.getTerminals().contains(symbol))
-                                terminals++;
-                            else
-                                terminals--;
-                        } else {
-                            if (grammar.getNonTerminals().contains(symbol))
-                                nonTerminals++;
-                            else
-                                nonTerminals--;
-                        }
-                    }
-                    if (grammar.getTerminals().contains(firstSymbol)) {
-                        if (terminals != production.length())
-                            return false;
-                    } else {
-                        if (nonTerminals != production.length())
-                            return false;
-                    }
+        Set<Rule> rules = originalGrammar.getRules();
+        for (Rule rule : rules) {
+            if (rule.getRight().length() < 2)
+                continue;
+            String left = rule.getLeft();
+            String right = rule.getRight();
+            boolean hasTerminal = false;
+
+            if (!isNonTerminal(left)) {
+                return false;
+            }
+            for (Character s : originalGrammar.getTerminals()) {
+                if (right.contains(s.toString()))
+                {
+                    hasTerminal = true;
+                    break;
                 }
+            }
+            for (Character s : originalGrammar.getNonTerminals()) {
+                if (right.contains(s.toString()) && hasTerminal)
+                    return false;
             }
         }
         return true;
+    }
+
+    /**
+     * Checks if a symbol is a non-terminal.
+     *
+     * @param symbol The symbol to check.
+     * @return True if the symbol is a non-terminal, otherwise false.
+     */
+    private boolean isNonTerminal(String symbol) {
+        return symbol.matches("[A-Z]");
     }
 
     /**
@@ -77,7 +80,7 @@ public class ChomskyGrammar {
      */
     public ContextFreeGrammar chomskify(int id) {
         ListOfGrammars grammars = ListOfGrammars.getGrammarListInstanceInstance();
-        ChomskyGrammar grammar = new ChomskyGrammar(grammars.getGrammarById(id));
+        ChomskyGrammar grammar = new ChomskyGrammar(originalGrammar);
         if (grammar == null) {
             System.out.println("Grammar with ID " + id + " not found.");
             return null;
@@ -85,10 +88,17 @@ public class ChomskyGrammar {
         if (!grammar.chomsky()) {
             ContextFreeGrammar grammar1 = new ContextFreeGrammar();
             grammars.addGrammar(grammar1);
-            grammar1.setRules(grammar.getGrammar().getRules());
-            grammar1.setUniqueId(grammar1.generateID());
-            grammar1.setTerminals(grammar.getGrammar().getTerminals());
-            grammar1.setNonTerminals(grammar.getGrammar().getNonTerminals());
+            Set<Rule> originalRules = grammar.getGrammar().getRules();
+            Set<Rule> newRules = new HashSet<>();
+            for (Rule originalRule : originalRules) {
+                Rule newRule = new Rule(originalRule.getNumber(), originalRule.getLeft(), originalRule.getRight());
+                newRules.add(newRule);
+            }
+            grammar1.setRules(newRules);
+            grammar1.generateID();
+            grammar1.setTerminals(new HashSet<>(grammar.getGrammar().getTerminals()));
+            grammar1.setNonTerminals(new HashSet<>(grammar.getGrammar().getNonTerminals()));
+            grammar1.setRuleCount(grammar.getGrammar().getRuleCount());
             convertLongProductions(grammar1);
             convertEpsilonProductions(grammar1);
             return grammar1;
@@ -97,55 +107,49 @@ public class ChomskyGrammar {
     }
 
     /**
-     * Converts long productions in the grammar.
+     * Converts long productions into Chomsky Normal Form.
      *
      * @param grammar The context-free grammar.
      */
     private void convertLongProductions(ContextFreeGrammar grammar) {
-        for (Map.Entry<Character, List<String>> entry : grammar.getRules().entrySet()) {
-            char nonTerminal = entry.getKey();
-            List<String> rules = new ArrayList<>(entry.getValue());
-            for (String rule : rules) {
-                String[] parts = rule.split("\\. ");
-                if (parts.length >= 2) {
-                    String production = parts[1].substring(parts[1].indexOf("->") + 2).trim();
-                    if (containsTerminalsAndNonTerminals(production)) {
-                        StringBuilder newProduction = new StringBuilder();
-                        for (char c : production.toCharArray()) {
-                            if (grammar.getNonTerminals().contains(c)) {
-                                List<String> nonTerminalRules = grammar.getRules(c);
-                                if (!nonTerminalRules.isEmpty()) {
-                                    String selectedRule = nonTerminalRules.get(new Random().nextInt(nonTerminalRules.size()));
-                                    newProduction.append(selectedRule.substring(selectedRule.indexOf("->") + 2).trim());
-                                }
-                            } else {
-                                newProduction.append(c);
+        Set<Rule> rules = new HashSet<>(grammar.getRules());
+        for (Rule rule : rules) {
+            String right = rule.getRight();
+            if (containsTerminalsAndNonTerminals(right)) {
+                StringBuilder newProduction = new StringBuilder();
+                for (char c : right.toCharArray()) {
+                    if (Character.isUpperCase(c)) {
+                        String characterC = String.valueOf(c);
+                        Set<Rule> nonTerminalRules = grammar.getRules();
+                        for (Rule nonTerminalRule : nonTerminalRules) {
+                            if (nonTerminalRule.getLeft().contains(characterC)) {
+                                newProduction.append(nonTerminalRule.getRight());
+                                break;
                             }
                         }
-                        grammar.removeRule(grammar.getUniqueId(), Integer.parseInt(parts[0]));
-                        grammar.addRule(grammar.getUniqueId(), nonTerminal + "->" + newProduction);
+                    } else {
+                        newProduction.append(c);
                     }
                 }
+                grammar.removeRule(grammar, rule.getNumber());
+                grammar.addRule(grammar, new Rule(rule.getNumber(), rule.getLeft(), newProduction.toString()));
             }
         }
     }
 
     /**
-     * Converts epsilon (ε) productions in the grammar.
+     * Converts epsilon productions into Chomsky Normal Form.
      *
-     * @param modifiedGrammar The modified context-free grammar.
+     * @param grammar The context-free grammar.
      */
-    private void convertEpsilonProductions(ContextFreeGrammar modifiedGrammar) {
-        for (Map.Entry<Character, List<String>> entry : modifiedGrammar.getRules().entrySet()) {
-            List<String> rules = new ArrayList<>(entry.getValue());
-            for (String rule : rules) {
-                String[] parts = rule.split("\\. ");
-                if (parts.length == 2) {
-                    String production = parts[1].substring(parts[1].indexOf("->") + 2).trim();
-                    if (production.equals("e")) {
-                        modifiedGrammar.removeRule(modifiedGrammar.getUniqueId(), Integer.parseInt(parts[0]));
-                    }
-                }
+    private void convertEpsilonProductions(ContextFreeGrammar grammar) {
+        Set<Rule> rules = new HashSet<>(grammar.getRules());
+        for (Rule rule : rules) {
+            String right = rule.getRight();
+            if (right.equals("e")) {
+                grammar.removeRule(grammar, rule.getNumber());
+                if (grammar.getTerminals().contains("e"))
+                    grammar.getTerminals().remove("e");
             }
         }
     }
@@ -154,7 +158,7 @@ public class ChomskyGrammar {
      * Checks if a string contains both terminals and non-terminals.
      *
      * @param input The string to check.
-     * @return True if the string contains both terminals and non-terminals.
+     * @return True if the string contains both terminals and non-terminals, otherwise false.
      */
     private boolean containsTerminalsAndNonTerminals(String input) {
         boolean containsTerminals = false;
@@ -171,4 +175,3 @@ public class ChomskyGrammar {
         return containsTerminals && containsNonTerminals;
     }
 }
-

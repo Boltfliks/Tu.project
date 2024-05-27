@@ -24,7 +24,7 @@ public class Empty implements Action {
             int id = Integer.parseInt(tokens[1]);
             ListOfGrammars grammars = ListOfGrammars.getGrammarListInstanceInstance();
             ContextFreeGrammar grammar = grammars.getGrammarById(id);
-            System.out.println(grammar.empty(grammar.getUniqueId()));
+            System.out.println(grammar.empty(grammar));
         } catch (NumberFormatException e) {
             try {
                 throw new MenuException("Wrong ID");

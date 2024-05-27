@@ -1,6 +1,7 @@
 package bg.tu_varna.sit.a2.f22621613.menu.menuActions;
 
 import bg.tu_varna.sit.a2.f22621613.grammar.algorithms.ConcatGrammar;
+import bg.tu_varna.sit.a2.f22621613.grammar.grammer_Singleton.ListOfGrammars;
 import bg.tu_varna.sit.a2.f22621613.menu.menuFunctionality.MenuException;
 
 /**
@@ -20,10 +21,12 @@ public class Concat implements Action {
             if (tokens.length != 3) {
                 throw new MenuException("Invalid number of arguments. Expected usage: <command> <id> <id>");
             }
+            ListOfGrammars grammars = ListOfGrammars.getGrammarListInstanceInstance();
             int id1 = Integer.parseInt(tokens[1]);
             int id2 = Integer.parseInt(tokens[2]);
+
             ConcatGrammar concatGrammar = new ConcatGrammar();
-            concatGrammar.concat(id1, id2);
+            concatGrammar.concat(grammars.getGrammarById(id1), grammars.getGrammarById(id2));
         } catch (NumberFormatException f) {
             try {
                 throw new MenuException("Wrong Id");

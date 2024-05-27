@@ -1,6 +1,7 @@
 package bg.tu_varna.sit.a2.f22621613.grammar.algorithms;
 
 import bg.tu_varna.sit.a2.f22621613.grammar.contextFreeGrammar.ContextFreeGrammar;
+import bg.tu_varna.sit.a2.f22621613.grammar.contextFreeGrammar.Rule;
 import bg.tu_varna.sit.a2.f22621613.grammar.grammer_Singleton.ListOfGrammars;
 
 import java.util.ArrayList;
@@ -14,23 +15,21 @@ import java.util.Set;
  */
 public class UnionGrammar {
 
+
     /**
-     * Creates a new context-free grammar that is the union of two existing grammars.
-     * The union grammar contains common non-terminals and rules from both grammars.
+     * Creates the union of two context-free grammars.
      *
-     * @param id1 The unique ID of the first grammar.
-     * @param id2 The unique ID of the second grammar.
-     * @return The new context-free grammar representing the union of the two grammars.
+     * @param grammar1 The first context-free grammar.
+     * @param grammar2 The second context-free grammar.
+     * @return A new context-free grammar that represents the union of the two grammars.
      */
-    public ContextFreeGrammar union(int id1, int id2) {
+    public ContextFreeGrammar union(ContextFreeGrammar grammar1, ContextFreeGrammar grammar2) {
         ListOfGrammars grammars = ListOfGrammars.getGrammarListInstanceInstance();
-        ContextFreeGrammar grammar1 = grammars.getGrammarById(id1);
-        ContextFreeGrammar grammar2 = grammars.getGrammarById(id2);
 
         ContextFreeGrammar unionGrammar = new ContextFreeGrammar();
         grammars.addGrammar(unionGrammar);
-        int newId = unionGrammar.generateID();
-        unionGrammar.setUniqueId(newId);
+
+        unionGrammar.generateID();
 
         unionGrammar.getTerminals().addAll(grammar1.getTerminals());
         unionGrammar.getTerminals().retainAll(grammar2.getTerminals());
@@ -39,39 +38,30 @@ public class UnionGrammar {
         unionNonTerminals.remove('S');
         unionGrammar.getNonTerminals().addAll(unionNonTerminals);
         unionGrammar.getNonTerminals().retainAll(grammar2.getNonTerminals());
-        List<String> commonRules = new ArrayList<>();
+        Set<Rule> commonRules = new HashSet<>();
 
-        for (char nonTerminal : grammar1.getNonTerminals()) {
-            if (grammar2.getNonTerminals().contains(nonTerminal)) {
-                List<String> rules1 = grammar1.getRules(nonTerminal);
-                List<String> rules2 = grammar2.getRules(nonTerminal);
-
-                for (String rule1 : rules1) {
-                    String ruleWithoutNumbering1 = rule1.substring((rule1.indexOf(".") + 1)).trim();
-
-                    for (String rule2 : rules2) {
-                        String ruleWithoutNumbering2 = rule2.substring((rule2.indexOf(".") + 1)).trim();
-                        if (ruleWithoutNumbering1.equals(ruleWithoutNumbering2)) {
-                            commonRules.add(ruleWithoutNumbering1);
-                            break;
-                        }
-                    }
+        for (Rule rule1 : grammar1.getRules()) {
+            for (Rule rule2 : grammar2.getRules()) {
+                if (rule1.equals(rule2)) {
+                    commonRules.add(rule1);
                 }
             }
         }
 
-        for (String rule : commonRules) {
-            unionGrammar.addRule(unionGrammar.getUniqueId(), rule);
+        for (Rule rule : commonRules) {
+            unionGrammar.addRule(unionGrammar, rule);
         }
 
-        if (unionGrammar.getTerminals().size() == 1 && unionGrammar.getTerminals().contains("e")) {
+        if (unionGrammar.getTerminals().size() == 1 && unionGrammar.getTerminals().contains('e')) {
             unionGrammar.getTerminals().clear();
         }
 
-        if (unionGrammar.empty(unionGrammar.getUniqueId())) {
+        if (unionGrammar.empty(unionGrammar)) {
             grammars.removeGrammar(unionGrammar);
         }
-
+        unionGrammar.getNonTerminals().add('S');
+        System.out.println(unionGrammar.getUniqueId());
         return unionGrammar;
     }
+
 }

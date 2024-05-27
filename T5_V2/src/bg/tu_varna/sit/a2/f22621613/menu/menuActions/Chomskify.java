@@ -19,6 +19,7 @@ public class Chomskify implements Action {
      */
     @Override
     public void action(MenuMap menuMap, String[] tokens) {
+
         try {
             if (tokens.length != 2) {
                 throw new MenuException("Invalid number of arguments. Expected usage: <command> <id>");
@@ -33,5 +34,6 @@ public class Chomskify implements Action {
         } catch (MenuException e) {
             System.out.println("Error: " + e.getMessage());
         }
+
     }
 }

@@ -1,6 +1,7 @@
 package bg.tu_varna.sit.a2.f22621613.menu.menuFunctionality;
 
 import bg.tu_varna.sit.a2.f22621613.grammar.contextFreeGrammar.ContextFreeGrammar;
+import bg.tu_varna.sit.a2.f22621613.grammar.contextFreeGrammar.Rule;
 import bg.tu_varna.sit.a2.f22621613.grammar.grammer_Singleton.ListOfGrammars;
 
 import java.io.File;
@@ -89,7 +90,7 @@ public class Menu implements FileFunctionality {
                 int Id = grammar.generateID();
                 Set<Character> terminals = extractCharacters(grammarContent, "<Terminal>");
                 Set<Character> nonTerminals = extractCharacters(grammarContent, "<NonTerminal>");
-                List<String> rules = findRules(grammarContent);
+               Set<Rule> rules = findRules(grammarContent);
 
                 for (char terminal : terminals) {
                     grammar.addTerminal(terminal);
@@ -97,10 +98,9 @@ public class Menu implements FileFunctionality {
                 for (char nonTerminal : nonTerminals) {
                     grammar.addNonTerminal(nonTerminal);
                 }
-                for (String rule : rules) {
+                for (Rule rule : rules) {
                     StringBuilder sb = new StringBuilder();
-                    sb.append(rule.substring(3));
-                    grammar.addRule(grammar.getUniqueId(), sb.toString());
+                    grammar.addRule(grammar, rule);
                 }
             }
             fileReader.close();
@@ -117,8 +117,7 @@ public class Menu implements FileFunctionality {
      * @param tag     The tag enclosing the characters to extract.
      * @return A set of characters enclosed by the specified tag in the content.
      */
-    @Override
-    public Set<Character> extractCharacters(String content, String tag) {
+    private Set<Character> extractCharacters(String content, String tag) {
         Set<Character> characters = new HashSet<>();
         int startIndex = content.indexOf(tag);
         while (startIndex != -1) {
@@ -138,15 +137,25 @@ public class Menu implements FileFunctionality {
      * @param content The content of the file from which to extract rules.
      * @return A list of rules found in the content.
      */
-    @Override
-    public List<String> findRules(String content) {
-        List<String> rules = new ArrayList<>();
+
+    private Set<Rule> findRules(String content) {
+        Set<Rule> rules = new HashSet<>();
         int startIndex = content.indexOf("<Rule>");
         while (startIndex != -1) {
             startIndex += "<Rule>".length();
             int endIndex = content.indexOf("</Rule>", startIndex);
             if (endIndex != -1) {
-                rules.add(content.substring(startIndex, endIndex));
+                String ruleContent = content.substring(startIndex, endIndex).trim();
+                int dotIndex = ruleContent.indexOf('.');
+                int arrowIndex = ruleContent.indexOf("->");
+
+                if (dotIndex != -1 && arrowIndex != -1 && dotIndex < arrowIndex) {
+                    int number = Integer.parseInt(ruleContent.substring(0, dotIndex).trim());
+                    String left = ruleContent.substring(dotIndex + 1, arrowIndex).trim();
+                    String right = ruleContent.substring(arrowIndex + 2).trim();
+                    Rule rule = new Rule(number, left, right);
+                    rules.add(rule);
+                }
             }
             startIndex = content.indexOf("<Rule>", endIndex);
         }

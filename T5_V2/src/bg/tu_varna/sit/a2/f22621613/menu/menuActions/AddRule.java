@@ -1,5 +1,6 @@
 package bg.tu_varna.sit.a2.f22621613.menu.menuActions;
 
+import bg.tu_varna.sit.a2.f22621613.grammar.contextFreeGrammar.Rule;
 import bg.tu_varna.sit.a2.f22621613.grammar.grammer_Singleton.ListOfGrammars;
 import bg.tu_varna.sit.a2.f22621613.menu.menuFunctionality.MenuException;
 
@@ -22,10 +23,11 @@ public class AddRule implements Action {
             }
 
             int id = Integer.parseInt(tokens[1]);
-            String rule = tokens[2];
+            String input = tokens[2];
 
             ListOfGrammars grammars = ListOfGrammars.getGrammarListInstanceInstance();
-            grammars.getGrammarById(id).addRule(id, rule);
+            Rule rule = new Rule(0,input.substring(input.indexOf('.')+1,input.indexOf("->")).trim(),input.substring(input.indexOf("->")+2).trim());
+            grammars.getGrammarById(id).addRule(grammars.getGrammarById(id), rule);
             System.out.println("Rule added");
         } catch (NumberFormatException e) {
             try {
