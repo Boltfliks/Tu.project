@@ -1,3 +1,0 @@
-Manifest-Version: 1.0
-Main-Class: bg.tu_varna.sit.a2.f22621613.Main
-
