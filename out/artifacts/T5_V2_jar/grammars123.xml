@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<List>
+  <ContextFreeGrammar>
+    <Terminals>
+      <Terminal>a</Terminal>
+      <Terminal>b</Terminal>
+      <Terminal>e</Terminal>
+    </Terminals>
+    <NonTerminals>
+      <NonTerminal>A</NonTerminal>
+      <NonTerminal>B</NonTerminal>
+      <NonTerminal>S</NonTerminal>
+    </NonTerminals>
+    <Rules>
+      <Rule>1. S->aB</Rule>
+      <Rule>2. A->a</Rule>
+      <Rule>3. A->e</Rule>
+      <Rule>4. B->b</Rule>
+    </Rules>
+  </ContextFreeGrammar>
+  <ContextFreeGrammar>
+    <Terminals>
+      <Terminal>1</Terminal>
+      <Terminal>c</Terminal>
+      <Terminal>e</Terminal>
+    </Terminals>
+    <NonTerminals>
+      <NonTerminal>S</NonTerminal>
+      <NonTerminal>C</NonTerminal>
+      <NonTerminal>D</NonTerminal>
+    </NonTerminals>
+    <Rules>
+      <Rule>1. S->cC</Rule>
+      <Rule>2. S->C</Rule>
+      <Rule>3. C->1c</Rule>
+      <Rule>4. D->e</Rule>
+    </Rules>
+  </ContextFreeGrammar>
+  <ContextFreeGrammar>
+    <Terminals>
+      <Terminal>a</Terminal>
+      <Terminal>1</Terminal>
+      <Terminal>b</Terminal>
+      <Terminal>c</Terminal>
+      <Terminal>e</Terminal>
+    </Terminals>
+    <NonTerminals>
+      <NonTerminal>A</NonTerminal>
+      <NonTerminal>B</NonTerminal>
+      <NonTerminal>S</NonTerminal>
+      <NonTerminal>C</NonTerminal>
+      <NonTerminal>D</NonTerminal>
+    </NonTerminals>
+    <Rules>
+      <Rule>1. A->a</Rule>
+      <Rule>2. A->e</Rule>
+      <Rule>3. B->b</Rule>
+      <Rule>4. S->aB</Rule>
+      <Rule>5. S->cC</Rule>
+      <Rule>6. S->C</Rule>
+      <Rule>7. C->1c</Rule>
+      <Rule>8. D->e</Rule>
+    </Rules>
+  </ContextFreeGrammar>
+  <ContextFreeGrammar>
+    <Terminals>
+      <Terminal>a</Terminal>
+      <Terminal>b</Terminal>
+      <Terminal>e</Terminal>
+    </Terminals>
+    <NonTerminals>
+      <NonTerminal>A</NonTerminal>
+      <NonTerminal>B</NonTerminal>
+      <NonTerminal>S</NonTerminal>
+    </NonTerminals>
+    <Rules>
+      <Rule>1. A->a</Rule>
+      <Rule>2. A->e</Rule>
+      <Rule>3. B->b</Rule>
+      <Rule>4. S->aB</Rule>
+    </Rules>
+  </ContextFreeGrammar>
+  <ContextFreeGrammar> 
+    <Terminals>
+      <Terminal>1</Terminal>
+      <Terminal>c</Terminal>
+      <Terminal>e</Terminal>
+    </Terminals>
+    <NonTerminals>
+      <NonTerminal>C</NonTerminal>
+      <NonTerminal>S</NonTerminal>
+      <NonTerminal>D</NonTerminal>
+      <NonTerminal>e</NonTerminal>
+    </NonTerminals>
+    <Rules>
+      <Rule>1. S->cC</Rule>
+      <Rule>2. S->C</Rule>
+      <Rule>3. C->1c</Rule>
+      <Rule>4. D->e</Rule>
+    </Rules>
+  </ContextFreeGrammar>
+  <ContextFreeGrammar> 
+    <Terminals>
+      <Terminal>a</Terminal>
+      <Terminal>b</Terminal>
+      <Terminal>e</Terminal>
+    </Terminals>
+    <NonTerminals>
+      <NonTerminal>A</NonTerminal>
+      <NonTerminal>B</NonTerminal>
+      <NonTerminal>S</NonTerminal>
+    </NonTerminals>
+    <Rules>
+      <Rule>1. A->aA</Rule>
+      <Rule>2. A->a</Rule>
+      <Rule>3. A->e</Rule>
+      <Rule>4. B->bB</Rule>
+      <Rule>5. B->b</Rule>
+      <Rule>6. B->e</Rule>
+      <Rule>7. S->aS</Rule>
+      <Rule>8. S->a</Rule>
+      <Rule>9. S->e</Rule>
+    </Rules>
+  </ContextFreeGrammar>
+  <ContextFreeGrammar> 
+    <Terminals>
+      <Terminal>a</Terminal>
+      <Terminal>b</Terminal>
+    </Terminals>
+    <NonTerminals>
+      <NonTerminal>A</NonTerminal>
+      <NonTerminal>B</NonTerminal>
+      <NonTerminal>C</NonTerminal>
+      <NonTerminal>S</NonTerminal>
+    </NonTerminals>
+    <Rules>
+      <Rule>1. S->AB</Rule>
+      <Rule>2. S->BC</Rule>
+      <Rule>3. A->BA</Rule>
+      <Rule>4. A->a</Rule>
+      <Rule>5. B->CC</Rule>
+      <Rule>6. B->b</Rule>
+      <Rule>7. C->AB</Rule>
+      <Rule>8. C->a</Rule>
+    </Rules>
+  </ContextFreeGrammar>
+</List>
